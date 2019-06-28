@@ -18,7 +18,7 @@ function insertProgress(f = "runtests.jl"; toplevel = true, s = 1)
 
     lines = readlines(f)
 
-    if any(x -> occursin("using ProgressMeter", x), lines)
+    if toplevel && any(x -> occursin("using ProgressMeter", x), lines)
         removeProgress(f)
         insertProgress(f, toplevel = toplevel, s = s)
     end
@@ -72,7 +72,7 @@ function removeProgress(f = "runtests.jl")
     open(f, "w") do io
         write(io, join(lines,'\n'))
     end
-
+    return nothing
 end
 
 end # module
