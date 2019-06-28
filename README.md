@@ -17,15 +17,10 @@ This package exports two functions: `insertProgress` and `removeProgress`.
 usually (and default) `f="runtests.jl"` and adds the necessary lines to add a progress-meter to the test.
 
 The rules are:
-- In the file `f`, a `using ProgressMeter` is added and a `Progress`
-- If `using ProgressMeter` is already present, don't do anything.
+- In the file `f`, a `using ProgressMeter` and a `Progress`is added
 - Before each `@test...` except `@testset`, `next!(p::Progress)` is inserted
 - The progressbar gives equal weight to each `@test...` in the file
 - Files that are `include`d are included too
-
-To have a `runtests.jl` with progressmeter,
- simply change the name of `pmruntests.jl` which is created by `insertProgress`
-to `runtests.jl`.
 
 To undo `insertProgress`, i.e. remove all inserted lines, apply `removeProgress`
 
