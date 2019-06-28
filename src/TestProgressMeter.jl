@@ -13,7 +13,6 @@ except `@testset`.
 To undo, apply `removeProgress(f)`.
 "
 function insertProgress(f = "runtests.jl"; toplevel = true, s = 1)
-    counter = 0
     isfile(f) || throw(ArgumentError("$f is not a file"))
 
     lines = readlines(f)
@@ -21,28 +20,29 @@ function insertProgress(f = "runtests.jl"; toplevel = true, s = 1)
     if toplevel && any(x -> occursin("using ProgressMeter", x), lines)
         removeProgress(f)
         insertProgress(f, toplevel = toplevel, s = s)
+        return nothing
     end
 
     for i in 1:length(lines)
         m = match(r"^([ \t]*)@test[^s]", lines[i])
         if m != nothing
-            lines[i] = string(m.captures[],"next!(p)\n", lines[i])
-            counter += 1
+            lines[i] = string(m.captures[],"next!(pmobj)\n", lines[i])
         end
         m = match(r"(include\(\")([^\")]*)(\"\))", lines[i])
         if m != nothing
             dir = dirname(f)
             nf  = joinpath(dir, m.captures[2])
-            counter += insertProgress(nf; toplevel = false)
+            insertProgress(nf; toplevel = false)
         end
     end
-    toplevel && pushfirst!(lines, "using ProgressMeter", "p = Progress($counter, $s)")
+    toplevel && pushfirst!(lines, "using ProgressMeter", "pmobj = ProgressUnknown($s)")
+    toplevel && push!(lines,"finish!(pmobj)")
 
     open(f, "w") do io
         write(io, join(lines,'\n'))
     end
+    return nothing
 
-    return counter
 end
 
 @doc raw"
@@ -57,8 +57,9 @@ function removeProgress(f = "runtests.jl")
     toremove = falses(length(lines))
     for i in 1:length(lines)
         toremove[i] =   occursin("using ProgressMeter", lines[i]) ||
-                        occursin("p = Progress", lines[i]) ||
-                        occursin("next!(p)", lines[i])
+                        occursin("pmobj = Progress", lines[i]) ||
+                        occursin("next!(pmobj)", lines[i]) ||
+                        occursin("finish!(pmobj)", lines[i])
 
         m = match(r"(include\(\")([^\")]*)(\"\))", lines[i])
         if m != nothing
