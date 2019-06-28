@@ -20,7 +20,7 @@ function insertProgress(f = "runtests.jl"; toplevel = true, s = 1)
 
     if any(x -> occursin("using ProgressMeter", x), lines)
         removeProgress(f)
-        insertProgress(f)
+        insertProgress(f, toplevel = toplevel, s = s)
     end
 
     for i in 1:length(lines)
@@ -64,7 +64,7 @@ function removeProgress(f = "runtests.jl")
         if m != nothing
             dir = dirname(f)
             nf  = joinpath(dir, m.captures[2])
-            removeProgress(nf; toplevel = false)
+            removeProgress(nf)
         end
     end
 
