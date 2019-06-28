@@ -1,6 +1,6 @@
 module TestProgressMeter
 
-export insertProgress
+export insertProgress, removeProgress
 
 @doc raw"
     insertProgress(f = 'runtests.jl'; toplevel = true, s = 1)
@@ -9,18 +9,20 @@ inserts the necessary statements into `f` such that a progress-bar
 is presented during testing which is updated all `s` seconds.
 The progress-bar gives equal weight to each `@test...`- statement
 except `@testset`.
-All changed files are saved with a 'pm' prefix in the same folder as
-the original file.
 
-If `ProgressMeter` is already imported, it's assumed that the
-function has been applied before and nothing happens.
+To undo, apply `removeProgress(f)`.
 "
 function insertProgress(f = "runtests.jl"; toplevel = true, s = 1)
     counter = 0
     isfile(f) || throw(ArgumentError("$f is not a file"))
 
     lines = readlines(f)
-    any(x -> occursin("using ProgressMeter", x), lines) && return
+
+    if any(x -> occursin("using ProgressMeter", x), lines)
+        removeProgress(f)
+        insertProgress(f)
+    end
+
     for i in 1:length(lines)
         m = match(r"^([ \t]*)@test[^s]", lines[i])
         if m != nothing
@@ -32,20 +34,45 @@ function insertProgress(f = "runtests.jl"; toplevel = true, s = 1)
             dir = dirname(f)
             nf  = joinpath(dir, m.captures[2])
             counter += insertProgress(nf; toplevel = false)
-            lines[i] =  m.captures[1] *
-                        joinpath(dirname(m.captures[2]), "pm" * basename(m.captures[2])) *
-                        m.captures[3]
         end
     end
-    join(lines, '\n')
     toplevel && pushfirst!(lines, "using ProgressMeter", "p = Progress($counter, $s)")
-    f = joinpath(dirname(f), "pm" * basename(f))
 
     open(f, "w") do io
         write(io, join(lines,'\n'))
     end
 
     return counter
+end
+
+@doc raw"
+    removeProgress(f = 'runtests.jl')
+assuming `f` is a `runtest` folder, `removeProgress`
+removes all statements inserted by `insertProgress`.
+"
+function removeProgress(f = "runtests.jl")
+    isfile(f) || throw(ArgumentError("$f is not a file"))
+
+    lines = readlines(f)
+    toremove = falses(length(lines))
+    for i in 1:length(lines)
+        toremove[i] =   occursin("using ProgressMeter", lines[i]) ||
+                        occursin("p = Progress", lines[i]) ||
+                        occursin("next!(p)", lines[i])
+
+        m = match(r"(include\(\")([^\")]*)(\"\))", lines[i])
+        if m != nothing
+            dir = dirname(f)
+            nf  = joinpath(dir, m.captures[2])
+            removeProgress(nf; toplevel = false)
+        end
+    end
+
+    deleteat!(lines, toremove)
+    open(f, "w") do io
+        write(io, join(lines,'\n'))
+    end
+
 end
 
 end # module
