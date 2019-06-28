@@ -9,8 +9,8 @@ inserts the necessary statements into `f` such that a progress-bar
 is presented during testing which is updated all `s` seconds.
 The progress-bar gives equal weight to each `@test...`- statement
 except `@testset`.
-All changed files are baked up with prefix 'bkup' in the same
-folder.
+All changed files are saved with a 'pm' prefix in the same folder as
+the original file.
 
 If `ProgressMeter` is already imported, it's assumed that the
 function has been applied before and nothing happens.
