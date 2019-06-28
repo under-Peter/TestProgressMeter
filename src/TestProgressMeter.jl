@@ -37,6 +37,7 @@ function insertProgress(f = "runtests.jl"; toplevel = true, s = 1)
     end
     toplevel && pushfirst!(lines, "using ProgressMeter", "pmobj = ProgressUnknown($s)")
     toplevel && push!(lines,"finish!(pmobj)")
+    toplevel && push!(lines,"println()")
 
     open(f, "w") do io
         write(io, join(lines,'\n'))
