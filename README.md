@@ -1,3 +1,5 @@
+**Disclaimer**: This package changes files and there's no guarantee that files can't be lost or made unreadable. Read the source and backup your files before using it.
+
 # TestProgressMeter
 
 Do you know the anxiety of running tests and not being sure whether anything's happening at all?
@@ -53,6 +55,6 @@ variable of that name in your tests, you'll run into trouble.
 
 # Contribute
 
-This is a tiny package I wrote for something I deemed useful. It's also my first code that manipulates files like that and if someone knows a better/safer/less intrusive way to achieve the same, let me know
+This is a tiny package I wrote for something I deemed useful. It's also my first code that manipulates files like that and if someone knows a better/safer/less intrusive way to achieve the same, let me know.
 Contributions are welcome to improve it, make it more powerful or improve the `pmobj` situation
 mentioned above.
