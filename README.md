@@ -53,6 +53,15 @@ variable of that name in your tests, you'll run into trouble.
 # Example
 [![asciicast](https://asciinema.org/a/BzQ4Y5WhBoTKUALgj5C6f8ozw.svg)](https://asciinema.org/a/BzQ4Y5WhBoTKUALgj5C6f8ozw)
 
+# Limitations
+
+- `@test` is only recognized if it appears first on a line (usually after some whitespace)
+
+- `include`d files are always included unless they are commented out, i.e. preceded by a `#` although no checks are made whether that `#` is not e.g. in a string.
+
+if your files are simple, don't have conditional `include`s and such, it should work fine
+
+
 # Contribute
 
 This is a tiny package I wrote for something I deemed useful. It's also my first code that manipulates files like that and if someone knows a better/safer/less intrusive way to achieve the same, let me know.
