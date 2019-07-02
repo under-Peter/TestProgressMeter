@@ -59,6 +59,8 @@ variable of that name in your tests, you'll run into trouble.
 
 - `include`d files are always included unless they are commented out, i.e. preceded by a `#` although no checks are made whether that `#` is not e.g. in a string.
 
+- You need to add `ProgressMeter.jl` manually to your (test-) dependencies.
+
 if your files are simple, don't have conditional `include`s and such, it should work fine
 
 
