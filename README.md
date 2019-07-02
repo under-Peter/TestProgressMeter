@@ -12,34 +12,47 @@ In the julia-repl, enter the Pkg-mode by pressing `]` on an empty line and then 
 ```
 
 # Usage
-This package exports two functions: `insertProgress` and `removeProgress`.
-`insertProgress` takes as argument a filename `f` of a file with `@test`s,
-usually (and default) `f="runtests.jl"` and adds the necessary lines to add a progress-indicator to the test.
 
-The rules are:
-- In the file `f`, a `using ProgressMeter` and a `ProgressUnknown`is added
-- Before each `@test...` except `@testset`, `next!(p::Progress)` is inserted
-- Files that are `include`d are included too
+This package provides two functions, `insertProgress` and `removeProgress`.
+```julia
+help?> insertProgress
+search: insertProgress
 
-To undo `insertProgress`, i.e. remove all inserted lines, apply `removeProgress`
+  insertProgress(f = 'runtests.jl'; toplevel = true, ntests = nothing, loops = true, pmargs = ())
+
+
+  recursively inserts next! statements before each test that's included in f and initializes the ProgressMeter at the beginning of the file according to the following rules:
+
+    •    if ntests - the number of tests - is provided, a progressbar will be shown with equal weight to each of the ntests tests
+
+    •    if ntests is not provided but loops=false, all @test will be counted and a progressbar will be shown with equal weight to each test
+
+    •    if neither ntests is provided nor loops=true, a simple counter will be shown of how many tests have been run
+
+  via pmargs, keyword-arguments to the ProgressMeter-object can be provided such as e.g.
+
+  julia> insertProgress("example/runtest.jl", pmargs = (desc = "Text next to errorbar", dt = 0.1), ntests = 10)
+
+
+  to get a progressbar that updates up to ever 0.1 seconds and has the text in desc next to it.
+
+help?> removeProgress
+search: removeProgress
+
+  removeProgress(f = 'runtests.jl')
+
+
+  assuming f is a runtest folder, removeProgress removes all statements inserted by insertProgress.
+```
+
+**Important:** the name of the `Progress`-variable is hardcoded to `pmobj` - if you have any
+variable of that name in your tests, you'll run into trouble.
 
 # Example
-Start a julia repl and execute
-```julia
-julia> insertProgress("[root]/TestProgressMeter/example/runtests.jl")
-```
-where `[root]` is the location where `TestProgressMeter` is installed
-If you then run
-```julia
-julia> include("[root]/TestProgressMeter/example/runtests.jl")
-```
-you should see a progress-indicator while your tests execute.
-Apply
-```julia
-julia> removeProgress("[root]/TestProgressMeter/example/runtests.jl")
-```
-to undo `insertProgress`.
+[![asciicast](https://asciinema.org/a/BzQ4Y5WhBoTKUALgj5C6f8ozw.svg)](https://asciinema.org/a/BzQ4Y5WhBoTKUALgj5C6f8ozw)
 
 # Contribute
 
 This is a tiny package I wrote for something I deemed useful. It's also my first code that manipulates files like that and if someone knows a better/safer/less intrusive way to achieve the same, let me know
+Contributions are welcome to improve it, make it more powerful or improve the `pmobj` situation
+mentioned above.
