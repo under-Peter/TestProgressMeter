@@ -26,5 +26,5 @@ using Test
         sleep(0.5)
         @test true
     end
-    # include("tests2/tests.jl")
+    include("tests2/tests.jl")
 end
