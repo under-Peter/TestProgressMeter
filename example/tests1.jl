@@ -1,3 +1,4 @@
+using Test
 @testset "Test1" begin
     @test true
     sleep(0.5)

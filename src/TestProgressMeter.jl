@@ -37,7 +37,7 @@ function insertProgress(f = "runtests.jl"; toplevel = true,
     for i in 1:length(lines)
         m = match(r"^([ \t]*)@test[^s]", lines[i])
         if m != nothing
-            lines[i] = string(m.captures[],"next!(pmobj)\n", lines[i])
+            lines[i] = string(m.captures[],"@isdefined(pmobj) && next!(pmobj)\n", lines[i])
             counter += 1
         end
         m = match(r"^[^\#]*(include\(\")([^\")]*)(\"\))", lines[i])
@@ -63,7 +63,7 @@ function insertProgress(f = "runtests.jl"; toplevel = true,
             pushfirst!(lines,
              "pmobj = ProgressUnknown($(pmargsstring))")
             lastend = findlast(x -> occursin("end", x), lines)
-            insert!(lines, lastend, "finish!(pmobj)")
+            insert!(lines, lastend, "@isdefined(pmobj) && finish!(pmobj)")
         end
         pushfirst!(lines, "using ProgressMeter")
         push!(lines, "println()")
